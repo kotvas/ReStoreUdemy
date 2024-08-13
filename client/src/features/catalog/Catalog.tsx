@@ -1,13 +1,13 @@
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
 import ProductList from "./ProductList";
-import { useEffect } from "react";
-import { fetchFiltersAsync, fetchProductsAsync, productSelectors, setPageNumber, setProductParams } from "./catalogSlice";
+import { setPageNumber, setProductParams } from "./catalogSlice";
 import { Grid, Paper } from "@mui/material";
 import ProductSearch from "./ProductSearch";
 import RadioButtonGroup from "../../app/components/RadioButtonGroup";
 import CheckboxButtons from "../../app/components/CheckboxButtons";
 import AppPagination from "../../app/components/AppPagination";
+import useProducts from "../../app/hooks/useProducts";
 
 const sortOptions = [
     { value: 'name', label: 'Alphabetical' },
@@ -16,17 +16,21 @@ const sortOptions = [
 ]
 
 export default function Catalog() {
-    const products = useAppSelector(productSelectors.selectAll);
-    const { productsLoaded, filtersLoaded, brands, types, productParams, metaData } = useAppSelector(state => state.catalog);
+    const { products, brands, types, filtersLoaded, metaData } = useProducts();
+    const { productParams } = useAppSelector(state => state.catalog);
     const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        if (!productsLoaded) dispatch(fetchProductsAsync());
-    }, [productsLoaded, dispatch])
+    // const products = useAppSelector(productSelectors.selectAll);
+    // const { productsLoaded, filtersLoaded, brands, types, productParams, metaData } = useAppSelector(state => state.catalog);
+    // const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        if (!filtersLoaded) dispatch(fetchFiltersAsync());
-    }, [filtersLoaded, dispatch])
+    // useEffect(() => {
+    //     if (!productsLoaded) dispatch(fetchProductsAsync());
+    // }, [productsLoaded, dispatch])
+
+    // useEffect(() => {
+    //     if (!filtersLoaded) dispatch(fetchFiltersAsync());
+    // }, [filtersLoaded, dispatch])
 
     if (!filtersLoaded) return <LoadingComponent message="Loading products..." />
 
@@ -69,10 +73,10 @@ export default function Catalog() {
             <Grid item xs={3} />
             <Grid item xs={9} sx={{ mb: 2 }}>
                 {metaData &&
-                <AppPagination
-                    metaData={metaData}
-                    onPageChange={(page: number) => dispatch(setPageNumber({ pageNumber: page }))}
-                />}
+                    <AppPagination
+                        metaData={metaData}
+                        onPageChange={(page: number) => dispatch(setPageNumber({ pageNumber: page }))}
+                    />}
             </Grid>
         </Grid>
 
